@@ -59,7 +59,6 @@ Integrate a movie database API (e.g., TMDb):
 Transform into a full-featured web application:
 
 - Build UI with ASP.NET  
-- صفحات:
   - Home (movie list)  
   - Movie details  
   - Add/search movies  
