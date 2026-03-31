@@ -1,91 +1,46 @@
-# 🎬 Film Tracker (.NET)
+# Film-Tracker (Console App)
 
-A .NET movie tracking application for managing a personal watchlist, organizing movies into "to watch" and "watched" categories, and tracking viewing history. Built as a console app with plans for API integration and a future web interface.
+A simple console-based application for managing a personal movie watchlist. Users can add movies, organize them into "To Watch" and "Watched" categories, and manage their collection.
 
----
+## Goal
 
-## Project Roadmap
+Build a product that allows users to maintain a list of movies, track what they want to watch, and mark movies as watched.
 
-### Stage 1: Console Application (MVP)
+## Features
 
-Build a simple console-based movie tracker with core functionality:
+- ➕ Add Movie: enter a movie title and choose status (To Watch / Watched)  
+- 📋 View Movies: display all movies grouped by status  
+- 🔄 Update Status: mark a movie as watched  
+- ❌ Delete Movie: remove a movie from the list  
+- 🔍 Search: search movies by title  
 
-- Add movies to a personal list  
-- Organize movies into:
-  - "To Watch"
-  - "Watched"  
-- Mark movies as watched  
-- Remove movies from the list  
-- Search movies by title  
+## User Interface
 
-**Data storage:**
-- In-memory (List)
+1. Add movie  
+2. Show movies  
+3. Mark as watched  
+4. Delete movie  
+5. Search  
+0. Exit  
 
----
+## Data Model
 
-### Stage 2: Application Structure & Features
+Each movie contains:
+- Title (string)  
+- Status (ToWatch / Watched)  
 
-Refactor the project for better structure and scalability:
+## Data Storage
 
-- Introduce clean architecture:
-  - Models (e.g., Movie)
-  - Services (business logic)
-  - UI layer (console menu)
+- In-memory collection (List<Movie>)   
 
-Add new features:
-- Movie rating (1–10)  
-- Personal notes / comments  
-- Date watched  
-- Genre support and filtering  
+## Scope
 
----
+This version intentionally excludes external APIs, databases, user authentication, and graphical interfaces.
 
-### Stage 3: External API Integration
+## Definition of Done
 
-Integrate a movie database API (e.g., TMDb):
-
-- Search movies via API  
-- Fetch:
-  - Descriptions  
-  - Ratings  
-  - Posters  
-- Add movies directly from API results  
-- Display detailed movie information  
-
----
-
-### Stage 4: Web Application (ASP.NET)
-
-Transform into a full-featured web application:
-
-- Build UI with ASP.NET  
-  - Home (movie list)  
-  - Movie details  
-  - Add/search movies  
-
-Features:
-- Filter by status ("To Watch" / "Watched")  
-- Search functionality  
-- Display posters and descriptions  
-
-Optional:
-- User authentication  
-- Personal user accounts  
-
----
-
-## Goals
-
-- Practice C# and .NET development  
-- Learn clean architecture principles  
-- Work with external APIs  
-- Build a full-stack web application  
-
----
-
-## Tech Stack
-
-- C# / .NET  
-- Console Application  
-- (Planned) ASP.NET  
-- (Planned) External API integration  
+- Movies can be added  
+- Movies can be displayed  
+- Status can be updated  
+- Movies can be deleted  
+- Application runs without errors  
