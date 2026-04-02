@@ -28,10 +28,10 @@ class Program
                     movieService.Delete();
                     break;
                 case "3":
-                    movieService.ShowAll();
+                    movieService.MarkAsWatched();
                     break;
                 case "4":
-                    movieService.MarkAsWatched();
+                    movieService.ShowAll();
                     break;
                 case "5":
                     return;
