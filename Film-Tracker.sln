@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Film-Tracker", "Film-Tracker\Film-Tracker.csproj", "{CE9800FE-7334-4886-9017-FCAF40DE44DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmTracker.Core", "FilmTracker.Core\FilmTracker.Core.csproj", "{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CE9800FE-7334-4886-9017-FCAF40DE44DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE9800FE-7334-4886-9017-FCAF40DE44DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE9800FE-7334-4886-9017-FCAF40DE44DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

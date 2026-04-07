@@ -1,15 +1,10 @@
-namespace Film_Tracker;
+namespace FilmTracker.Core.Models;
 
-public enum MovieStatus
-{
-    ToWatch,
-    Watched
-}
 public class Movie
 {
     public string Title { get; set; }
     public MovieStatus Status { get; set; }
-    
+
     public Movie(string title, MovieStatus status)
     {
         Title = title;

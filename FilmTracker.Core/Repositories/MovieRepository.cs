@@ -1,8 +1,10 @@
-namespace Film_Tracker;
+using FilmTracker.Core.Models;
+
+namespace FilmTracker.Core.Repositories;
 
 public class MovieRepository
 {
-    private readonly List<Movie> _movies = [];
+    private readonly List<Movie> _movies = new();
 
     public void Add(Movie movie)
     {
