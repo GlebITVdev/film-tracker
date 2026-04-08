@@ -10,14 +10,38 @@ public class MovieRepository
     {
         _movies.Add(movie);
     }
-
     public List<Movie> GetAll()
     {
-        return _movies;
+        return _movies.ToList();
     }
-
-    public void RemoveAt(int index)
+    public List<Movie> GetByStatus(MovieStatus status)
     {
-        _movies.RemoveAt(index);
+        return _movies
+            .Where(m => m.Status == status)
+            .ToList();
+    }
+    public bool DeleteById(Guid id)
+    {
+        var movie = _movies.FirstOrDefault(m => m.Id == id);
+
+        if (movie == null)
+        {
+            return false;
+        }
+
+        _movies.Remove(movie);
+        return true;
+    }
+    public bool UpdateStatus(Guid id, MovieStatus status)
+    {
+        var movie = _movies.FirstOrDefault(m => m.Id == id);
+
+        if (movie == null)
+        {
+            return false;
+        }
+
+        movie.Status = status;
+        return true;
     }
 }

@@ -6,12 +6,10 @@ namespace FilmTracker.Core.Services;
 public class MovieService
 {
     private readonly MovieRepository _repository;
-
     public MovieService()
     {
         _repository = new MovieRepository();
     }
-
     public bool AddMovie(string title, MovieStatus status)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -23,51 +21,24 @@ public class MovieService
         _repository.Add(movie);
         return true;
     }
-
     public List<Movie> GetAllMovies()
     {
         return _repository.GetAll();
     }
-
     public List<Movie> GetToWatchMovies()
     {
-        return _repository
-            .GetAll()
-            .Where(m => m.Status == MovieStatus.ToWatch)
-            .ToList();
+        return _repository.GetByStatus(MovieStatus.ToWatch);
     }
-
     public List<Movie> GetWatchedMovies()
     {
-        return _repository
-            .GetAll()
-            .Where(m => m.Status == MovieStatus.Watched)
-            .ToList();
+        return _repository.GetByStatus(MovieStatus.Watched);
     }
-
-    public bool DeleteMovie(int index)
+    public bool DeleteMovie(Guid id)
     {
-        var movies = _repository.GetAll();
-
-        if (index < 0 || index >= movies.Count)
-        {
-            return false;
-        }
-
-        _repository.RemoveAt(index);
-        return true;
+        return _repository.DeleteById(id);
     }
-
-    public bool MarkAsWatched(int index)
+    public bool MarkAsWatched(Guid id)
     {
-        var toWatchMovies = GetToWatchMovies();
-
-        if (index < 0 || index >= toWatchMovies.Count)
-        {
-            return false;
-        }
-
-        toWatchMovies[index].Status = MovieStatus.Watched;
-        return true;
+        return _repository.UpdateStatus(id, MovieStatus.Watched);
     }
 }

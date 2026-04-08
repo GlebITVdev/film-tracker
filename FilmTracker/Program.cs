@@ -132,17 +132,26 @@ class Program
 
         Console.WriteLine("Select a movie to delete:");
 
-        for (int i = 0; i < movies.Count; i++)
+        for (var i = 0; i < movies.Count; i++)
         {
             Console.WriteLine($"{i + 1}. {movies[i].Title}");
         }
 
         var choice = ReadNumber();
-        var isDeleted = service.DeleteMovie(choice - 1);
+
+        if (choice < 1 || choice > movies.Count)
+        {
+            Console.WriteLine("Invalid number!");
+            Pause();
+            return;
+        }
+
+        var selectedMovie = movies[choice - 1];
+        var isDeleted = service.DeleteMovie(selectedMovie.Id);
 
         if (!isDeleted)
         {
-            Console.WriteLine("Invalid number!");
+            Console.WriteLine("Movie was not found!");
             Pause();
             return;
         }
@@ -150,7 +159,7 @@ class Program
         Console.WriteLine("Movie deleted!");
         Pause();
     }
-
+    
     static void MarkAsWatched(MovieService service)
     {
         var toWatchMovies = service.GetToWatchMovies();
@@ -170,11 +179,21 @@ class Program
         }
 
         var choice = ReadNumber();
-        var isMarked = service.MarkAsWatched(choice - 1);
+
+        if (choice < 1 || choice > toWatchMovies.Count)
+        {
+            Console.WriteLine("Invalid number!");
+            Pause();
+            return;
+        }
+
+        var selectedMovie = toWatchMovies[choice - 1];
+
+        var isMarked = service.MarkAsWatched(selectedMovie.Id);
 
         if (!isMarked)
         {
-            Console.WriteLine("Invalid number!");
+            Console.WriteLine("Movie not found!");
             Pause();
             return;
         }

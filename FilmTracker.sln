@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Film-Tracker", "Film-Tracker\Film-Tracker.csproj", "{CE9800FE-7334-4886-9017-FCAF40DE44DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmTracker", "FilmTracker\FilmTracker.csproj", "{CE9800FE-7334-4886-9017-FCAF40DE44DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmTracker.Core", "FilmTracker.Core\FilmTracker.Core.csproj", "{BAB7AF6B-5853-471A-BD55-1FE6DB1586C0}"
 EndProject
