@@ -39,6 +39,15 @@ public class MovieService
     }
     public bool MarkAsWatched(Guid id)
     {
-        return _repository.UpdateStatus(id, MovieStatus.Watched);
+        var movie = _repository.GetById(id);
+
+        if (movie == null)
+        {
+            return false;
+        }
+
+        movie.Status = MovieStatus.Watched;
+
+        return _repository.Update(movie);
     }
 }

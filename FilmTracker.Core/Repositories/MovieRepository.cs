@@ -20,6 +20,10 @@ public class MovieRepository
             .Where(m => m.Status == status)
             .ToList();
     }
+    public Movie? GetById(Guid id)
+    {
+        return _movies.FirstOrDefault(m => m.Id == id);
+    }
     public bool DeleteById(Guid id)
     {
         var movie = _movies.FirstOrDefault(m => m.Id == id);
@@ -32,16 +36,18 @@ public class MovieRepository
         _movies.Remove(movie);
         return true;
     }
-    public bool UpdateStatus(Guid id, MovieStatus status)
+    public bool Update(Movie updatedMovie)
     {
-        var movie = _movies.FirstOrDefault(m => m.Id == id);
+        var movie = _movies.FirstOrDefault(m => m.Id == updatedMovie.Id);
 
         if (movie == null)
         {
             return false;
         }
 
-        movie.Status = status;
+        movie.Title = updatedMovie.Title;
+        movie.Status = updatedMovie.Status;
+
         return true;
     }
 }
