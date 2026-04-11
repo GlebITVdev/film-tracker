@@ -1,6 +1,8 @@
-﻿using System;
+﻿using FilmTracker.Core.Data;
 using FilmTracker.Core.Models;
+using FilmTracker.Core.Repositories;
 using FilmTracker.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmTracker.ConsoleApp;
 
@@ -8,7 +10,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        var service = new MovieService();
+        var connectionString = "Host=localhost;Port=5432;Database=filmtracker_db;Username=postgres;Password=postgres";
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+
+        var context = new AppDbContext(options);
+
+        var repository = new EfMovieRepository(context);
+        var service = new MovieService(repository);
 
         while (true)
         {
