@@ -5,10 +5,10 @@ namespace FilmTracker.Core.Services;
 
 public class MovieService
 {
-    private readonly MovieRepository _repository;
-    public MovieService()
+    private readonly IMovieRepository _repository;
+    public MovieService(IMovieRepository repository)
     {
-        _repository = new MovieRepository();
+        _repository = repository;
     }
     public bool AddMovie(string title, MovieStatus status)
     {
@@ -17,7 +17,7 @@ public class MovieService
             return false;
         }
 
-        var movie = new Movie(title, status);
+        var movie = new Movie(title.Trim(), status);
         _repository.Add(movie);
         return true;
     }
@@ -45,9 +45,7 @@ public class MovieService
         {
             return false;
         }
-
         movie.Status = MovieStatus.Watched;
-
         return _repository.Update(movie);
     }
 }
