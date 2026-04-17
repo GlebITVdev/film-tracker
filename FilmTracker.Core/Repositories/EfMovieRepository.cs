@@ -1,6 +1,8 @@
 using FilmTracker.Core.Data;
 using FilmTracker.Core.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
+
 
 namespace FilmTracker.Core.Repositories;
 
@@ -13,56 +15,48 @@ public class EfMovieRepository : IMovieRepository
         _context = context;
     }
 
-    public void Add(Movie movie)
+    public async Task AddAsync(Movie movie)
     {
-        _context.Movies.Add(movie);
-        _context.SaveChanges();
+        await _context.Movies.AddAsync(movie);
+        await _context.SaveChangesAsync();
     }
 
-    public List<Movie> GetAll()
+    public async Task<ImmutableArray<Movie>> GetAllAsync()
     {
-        return _context.Movies.ToList();
+        var list = await _context.Movies.ToListAsync();
+        return list.ToImmutableArray();
     }
 
-    public List<Movie> GetByStatus(MovieStatus status)
+    public async Task<ImmutableArray<Movie>> GetByStatusAsync(MovieStatus status)
     {
-        return _context.Movies
+        var list = await _context.Movies
             .Where(m => m.Status == status)
-            .ToList();
+            .ToListAsync();
+        return list.ToImmutableArray();
     }
 
-    public Movie? GetById(Guid id)
+    public async Task<Movie?> GetByIdAsync(Guid id)
     {
-        return _context.Movies.FirstOrDefault(m => m.Id == id);
+        return await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    public bool DeleteById(Guid id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
-        var movie = _context.Movies.FirstOrDefault(m => m.Id == id);
+        var affectedRows = await _context.Movies
+            .Where(m => m.Id == id)
+            .ExecuteDeleteAsync();
 
-        if (movie == null)
-        {
-            return false;
-        }
-
-        _context.Movies.Remove(movie);
-        _context.SaveChanges();
-        return true;
+        return affectedRows > 0;
     }
 
-    public bool Update(Movie updatedMovie)
+    public async Task<bool> UpdateAsync(Movie updatedMovie)
     {
-        var existingMovie = _context.Movies.FirstOrDefault(m => m.Id == updatedMovie.Id);
+        var affectedRows = await _context.Movies
+            .Where(m => m.Id == updatedMovie.Id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.Title, updatedMovie.Title)
+                .SetProperty(m => m.Status, updatedMovie.Status));
 
-        if (existingMovie == null)
-        {
-            return false;
-        }
-
-        existingMovie.Title = updatedMovie.Title;
-        existingMovie.Status = updatedMovie.Status;
-
-        _context.SaveChanges();
-        return true;
+        return affectedRows > 0;
     }
 }
