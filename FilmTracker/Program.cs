@@ -2,21 +2,14 @@
 using FilmTracker.Core.Models;
 using FilmTracker.Core.Repositories;
 using FilmTracker.Core.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace FilmTracker.ConsoleApp;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        var connectionString = "Host=localhost;Port=5432;Database=filmtracker_db;Username=postgres;Password=postgres";
-
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(connectionString)
-            .Options;
-
-        var context = new AppDbContext(options);
+        await using var context = new AppDbContext();
 
         var repository = new EfMovieRepository(context);
         var service = new MovieService(repository);
@@ -29,25 +22,29 @@ class Program
             Console.WriteLine("2. Delete movie");
             Console.WriteLine("3. Show movies");
             Console.WriteLine("4. Mark as watched");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("5. Edit movie title");
+            Console.WriteLine("6. Exit");
 
             var choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    AddMovie(service);
+                    await AddMovie(service);
                     break;
                 case "2":
-                    DeleteMovie(service);
+                    await DeleteMovie(service);
                     break;
                 case "3":
-                    ShowMovies(service);
+                    await ShowMovies(service);
                     break;
                 case "4":
-                    MarkAsWatched(service);
+                    await MarkAsWatched(service);
                     break;
                 case "5":
+                    await EditMovieTitle(service);
+                    break;
+                case "6":
                     return;
                 default:
                     Console.WriteLine("Invalid option!");
@@ -57,7 +54,7 @@ class Program
         }
     }
 
-    static void AddMovie(MovieService service)
+    static async Task AddMovie(MovieService service)
     {
         Console.WriteLine("Enter movie title:");
         var title = Console.ReadLine();
@@ -83,7 +80,7 @@ class Program
                 return;
         }
 
-        var isAdded = service.AddMovie(title ?? string.Empty, status);
+        var isAdded = await service.AddMovieAsync(title ?? string.Empty, status);
 
         if (!isAdded)
         {
@@ -96,13 +93,13 @@ class Program
         Pause();
     }
 
-    static void ShowMovies(MovieService service)
+    static async Task ShowMovies(MovieService service)
     {
-        var toWatch = service.GetToWatchMovies();
-        var watched = service.GetWatchedMovies();
+        var toWatch = await service.GetToWatchMoviesAsync();
+        var watched = await service.GetWatchedMoviesAsync();
 
         Console.WriteLine("To Watch:");
-        if (toWatch.Count == 0)
+        if (toWatch.Length == 0)
         {
             Console.WriteLine("No movies to watch yet.");
         }
@@ -115,7 +112,7 @@ class Program
         }
 
         Console.WriteLine("\nWatched:");
-        if (watched.Count == 0)
+        if (watched.Length == 0)
         {
             Console.WriteLine("No watched movies yet.");
         }
@@ -130,11 +127,11 @@ class Program
         Pause();
     }
 
-    static void DeleteMovie(MovieService service)
+    static async Task DeleteMovie(MovieService service)
     {
-        var movies = service.GetAllMovies();
+        var movies = await service.GetAllMoviesAsync();
 
-        if (movies.Count == 0)
+        if (movies.Length == 0)
         {
             Console.WriteLine("No movies to delete!");
             Pause();
@@ -143,14 +140,14 @@ class Program
 
         Console.WriteLine("Select a movie to delete:");
 
-        for (var i = 0; i < movies.Count; i++)
+        for (var i = 0; i < movies.Length; i++)
         {
             Console.WriteLine($"{i + 1}. {movies[i].Title}");
         }
 
         var choice = ReadNumber();
 
-        if (choice < 1 || choice > movies.Count)
+        if (choice < 1 || choice > movies.Length)
         {
             Console.WriteLine("Invalid number!");
             Pause();
@@ -158,7 +155,7 @@ class Program
         }
 
         var selectedMovie = movies[choice - 1];
-        var isDeleted = service.DeleteMovie(selectedMovie.Id);
+        var isDeleted = await service.DeleteMovieAsync(selectedMovie.Id);
 
         if (!isDeleted)
         {
@@ -171,11 +168,11 @@ class Program
         Pause();
     }
     
-    static void MarkAsWatched(MovieService service)
+    static async Task MarkAsWatched(MovieService service)
     {
-        var toWatchMovies = service.GetToWatchMovies();
+        var toWatchMovies = await service.GetToWatchMoviesAsync();
 
-        if (toWatchMovies.Count == 0)
+        if (toWatchMovies.Length == 0)
         {
             Console.WriteLine("No movies to mark as watched!");
             Pause();
@@ -184,14 +181,14 @@ class Program
 
         Console.WriteLine("Select a movie to mark as watched:");
 
-        for (int i = 0; i < toWatchMovies.Count; i++)
+        for (int i = 0; i < toWatchMovies.Length; i++)
         {
             Console.WriteLine($"{i + 1}. {toWatchMovies[i].Title}");
         }
 
         var choice = ReadNumber();
 
-        if (choice < 1 || choice > toWatchMovies.Count)
+        if (choice < 1 || choice > toWatchMovies.Length)
         {
             Console.WriteLine("Invalid number!");
             Pause();
@@ -200,7 +197,7 @@ class Program
 
         var selectedMovie = toWatchMovies[choice - 1];
 
-        var isMarked = service.MarkAsWatched(selectedMovie.Id);
+        var isMarked = await service.MarkAsWatchedAsync(selectedMovie.Id);
 
         if (!isMarked)
         {
@@ -210,6 +207,51 @@ class Program
         }
 
         Console.WriteLine("Movie marked as watched!");
+        Pause();
+    }
+
+    static async Task EditMovieTitle(MovieService service)
+    {
+        var movies = await service.GetAllMoviesAsync();
+
+        if (movies.Length == 0)
+        {
+            Console.WriteLine("No movies to edit!");
+            Pause();
+            return;
+        }
+
+        Console.WriteLine("Select a movie to edit: ");
+
+        for (int i = 0; i < movies.Length; i++)
+        {
+            Console.WriteLine($"{i + 1}. {movies[i].Title}");
+        }
+        
+        var choice = ReadNumber();
+
+        if (choice < 1 || choice > movies.Length)
+        {
+            Console.WriteLine("Invalid number!");
+            Pause();
+            return;
+        }
+
+        var selectedMovie = movies[choice - 1];
+
+        Console.WriteLine("Enter new title:");
+        var newTitle = Console.ReadLine();
+        
+        var isUpdated = await service.EditMovieTitleAsync(selectedMovie.Id, newTitle ?? string.Empty);
+
+        if (!isUpdated)
+        {
+            Console.WriteLine("Title cannot be empty or movie was not found!");
+            Pause();
+            return;
+        }
+
+        Console.WriteLine("Movie title updated!");
         Pause();
     }
 

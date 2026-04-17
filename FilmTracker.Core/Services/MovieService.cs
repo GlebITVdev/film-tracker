@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using FilmTracker.Core.Models;
 using FilmTracker.Core.Repositories;
 
@@ -10,7 +11,7 @@ public class MovieService
     {
         _repository = repository;
     }
-    public bool AddMovie(string title, MovieStatus status)
+    public async Task<bool> AddMovieAsync(string title, MovieStatus status)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -18,34 +19,50 @@ public class MovieService
         }
 
         var movie = new Movie(title.Trim(), status);
-        _repository.Add(movie);
+        await _repository.AddAsync(movie);
         return true;
     }
-    public List<Movie> GetAllMovies()
+    public async Task<ImmutableArray<Movie>> GetAllMoviesAsync()
     {
-        return _repository.GetAll();
+        return await _repository.GetAllAsync();
     }
-    public List<Movie> GetToWatchMovies()
+    public async  Task<ImmutableArray<Movie>> GetToWatchMoviesAsync()
     {
-        return _repository.GetByStatus(MovieStatus.ToWatch);
+        return await _repository.GetByStatusAsync(MovieStatus.ToWatch);
     }
-    public List<Movie> GetWatchedMovies()
+    public async Task<ImmutableArray<Movie>> GetWatchedMoviesAsync()
     {
-        return _repository.GetByStatus(MovieStatus.Watched);
+        return await _repository.GetByStatusAsync(MovieStatus.Watched);
     }
-    public bool DeleteMovie(Guid id)
+    public async Task<bool> DeleteMovieAsync(Guid id)
     {
-        return _repository.DeleteById(id);
+        return await _repository.DeleteByIdAsync(id);
     }
-    public bool MarkAsWatched(Guid id)
+    public async Task<bool> MarkAsWatchedAsync(Guid id)
     {
-        var movie = _repository.GetById(id);
+        var movie = await _repository.GetByIdAsync(id);
 
         if (movie == null)
         {
             return false;
         }
         movie.Status = MovieStatus.Watched;
-        return _repository.Update(movie);
+        return await _repository.UpdateAsync(movie);
+    }
+
+    public async Task<bool> EditMovieTitleAsync(Guid id, string newTitle)
+    {
+        if (string.IsNullOrWhiteSpace(newTitle))
+        {
+            return false; 
+        }
+        var movie = await _repository.GetByIdAsync(id);
+        if (movie == null)
+        {
+            return false;
+        }
+        movie.Title = newTitle;
+        
+        return await _repository.UpdateAsync(movie);
     }
 }
