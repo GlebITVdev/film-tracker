@@ -40,7 +40,7 @@ public class MovieService
     }
     public async Task<bool> MarkAsWatchedAsync(Guid id)
     {
-        var movie = await _repository.GetByIdAsync(id);
+        var movie = await _repository.TryGetByIdAsync(id);
 
         if (movie == null)
         {
@@ -56,7 +56,7 @@ public class MovieService
         {
             return false; 
         }
-        var movie = await _repository.GetByIdAsync(id);
+        var movie = await _repository.TryGetByIdAsync(id);
         if (movie == null)
         {
             return false;

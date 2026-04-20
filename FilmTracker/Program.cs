@@ -2,6 +2,8 @@
 using FilmTracker.Core.Models;
 using FilmTracker.Core.Repositories;
 using FilmTracker.Core.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace FilmTracker.ConsoleApp;
 
@@ -9,9 +11,20 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        await using var context = new AppDbContext();
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
 
-        var repository = new EfMovieRepository(context);
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+
+        await using var context = new AppDbContext(options);
+
+        var repository = new MovieRepository(context);
         var service = new MovieService(repository);
 
         while (true)
