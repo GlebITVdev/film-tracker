@@ -6,11 +6,11 @@ using System.Collections.Immutable;
 
 namespace FilmTracker.Core.Repositories;
 
-public class EfMovieRepository : IMovieRepository
+public class MovieRepository : IMovieRepository
 {
     private readonly AppDbContext _context;
 
-    public EfMovieRepository(AppDbContext context)
+    public MovieRepository(AppDbContext context)
     {
         _context = context;
     }
@@ -35,7 +35,7 @@ public class EfMovieRepository : IMovieRepository
         return list.ToImmutableArray();
     }
 
-    public async Task<Movie?> GetByIdAsync(Guid id)
+    public async Task<Movie?> TryGetByIdAsync(Guid id)
     {
         return await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
     }

@@ -7,7 +7,7 @@ public interface IMovieRepository
 {
     Task<ImmutableArray<Movie>> GetAllAsync();
     Task<ImmutableArray<Movie>> GetByStatusAsync(MovieStatus status);
-    Task<Movie?> GetByIdAsync(Guid id);
+    Task<Movie?> TryGetByIdAsync(Guid id);
     Task AddAsync(Movie movie);
     Task<bool> DeleteByIdAsync(Guid id);
     Task<bool> UpdateAsync(Movie movie);
