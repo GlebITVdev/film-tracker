@@ -35,7 +35,10 @@ public class MovieServiceTests
         var result = await service.AddMovieAsync("Inception", MovieStatus.ToWatch);
     
         Assert.True(result);
-        mockRepo.Verify(r => r.AddAsync(It.IsAny<Movie>()), Times.Once);
+        mockRepo.Verify(r => r.AddAsync(It.Is<Movie>(m => 
+            m.Title == "Inception" && 
+            m.Status == MovieStatus.ToWatch)), 
+        Times.Once);
     }
 
     [Fact]
@@ -43,12 +46,14 @@ public class MovieServiceTests
     {
         var mockRepo = new Mock<IMovieRepository>();
         
-        mockRepo.Setup(r => r.TryGetByIdAsync(It.IsAny<Guid>()))
+        var movieId = Guid.NewGuid();
+        
+        mockRepo.Setup(r => r.TryGetByIdAsync(movieId))
             .ReturnsAsync((Movie?)null);
         
         var service = new MovieService(mockRepo.Object);
         
-        var result = await service.MarkAsWatchedAsync(Guid.NewGuid());
+        var result = await service.MarkAsWatchedAsync(movieId);
         
         Assert.False(result);
         mockRepo.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Never);
@@ -72,7 +77,10 @@ public class MovieServiceTests
         
         Assert.True(result);
         Assert.Equal(MovieStatus.Watched, movie.Status);
-        mockRepo.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Once);
+        mockRepo.Verify(r => r.UpdateAsync(It.Is<Movie>(m => 
+                m.Title == "Inception" &&
+                m.Status == MovieStatus.Watched)), 
+            Times.Once);
     }
 
     [Theory]
@@ -94,12 +102,14 @@ public class MovieServiceTests
     public async Task EditMovieTitleAsync_ShouldReturnFalse_WhenMovieNotFound()
     {
         var mockRepo = new Mock<IMovieRepository>();
+        
+        var movieId = Guid.NewGuid();
 
-        mockRepo.Setup(r => r.TryGetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Movie?)null);
+        mockRepo.Setup(r => r.TryGetByIdAsync(movieId)).ReturnsAsync((Movie?)null);
         
         var service = new MovieService(mockRepo.Object);
         
-        var result = await service.EditMovieTitleAsync(Guid.NewGuid(), "New Title");
+        var result = await service.EditMovieTitleAsync(movieId, "New Title");
         
         Assert.False(result);
         mockRepo.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Never);
@@ -123,7 +133,10 @@ public class MovieServiceTests
 
         Assert.True(result);
         Assert.Equal("New Title", movie.Title);
-        mockRepo.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Once);
+        mockRepo.Verify(r => r.UpdateAsync(It.Is<Movie>(m => 
+                m.Title == "New Title" &&
+                m.Status == MovieStatus.ToWatch)), 
+            Times.Once);
     }
     
     [Fact]
@@ -136,10 +149,12 @@ public class MovieServiceTests
         
         var service = new MovieService(mockRepo.Object);
         
-        var result = await service.DeleteMovieAsync(Guid.NewGuid());
+        var movieId = Guid.NewGuid();
+
+        var result = await service.DeleteMovieAsync(movieId);
         
         Assert.False(result);
-        mockRepo.Verify(r => r.DeleteByIdAsync(It.IsAny<Guid>()), Times.Once);
+        mockRepo.Verify(r => r.DeleteByIdAsync(movieId), Times.Once);
     }
     
     [Fact]
@@ -152,10 +167,12 @@ public class MovieServiceTests
         
         var service = new MovieService(mockRepo.Object);
         
-        var result = await service.DeleteMovieAsync(Guid.NewGuid());
+        var movieId = Guid.NewGuid();
+
+        var result = await service.DeleteMovieAsync(movieId);
         
         Assert.True(result);
-        mockRepo.Verify(r => r.DeleteByIdAsync(It.IsAny<Guid>()), Times.Once);
+        mockRepo.Verify(r => r.DeleteByIdAsync(movieId), Times.Once);
     }
 
     [Fact]
