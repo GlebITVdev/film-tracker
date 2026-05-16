@@ -11,7 +11,7 @@ public class MovieService
     {
         _repository = repository;
     }
-    public async Task<bool> AddMovieAsync(string title, MovieStatus status)
+    public async Task<bool> AddMovieAsync(string? title, MovieStatus status)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -50,7 +50,7 @@ public class MovieService
         return await _repository.UpdateAsync(movie);
     }
 
-    public async Task<bool> EditMovieTitleAsync(Guid id, string newTitle)
+    public async Task<bool> EditMovieTitleAsync(Guid id, string? newTitle)
     {
         if (string.IsNullOrWhiteSpace(newTitle))
         {
