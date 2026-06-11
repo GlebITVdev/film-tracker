@@ -1,0 +1,12 @@
+[1mdiff --git a/FilmTracker.Core/FilmTracker.Core.csproj b/FilmTracker.Core/FilmTracker.Core.csproj[m
+[1mindex 8639767..5048928 100644[m
+[1m--- a/FilmTracker.Core/FilmTracker.Core.csproj[m
+[1m+++ b/FilmTracker.Core/FilmTracker.Core.csproj[m
+[36m@@ -12,7 +12,6 @@[m
+         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>[m
+         <PrivateAssets>all</PrivateAssets>[m
+       </PackageReference>[m
+[31m-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />[m
+       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />[m
+       <PackageReference Include="System.Collections.Immutable" Version="10.0.6" />[m
+     </ItemGroup>[m
