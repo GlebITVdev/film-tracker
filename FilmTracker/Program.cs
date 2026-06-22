@@ -4,6 +4,8 @@ using FilmTracker.Core.Repositories;
 using FilmTracker.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace FilmTracker.ConsoleApp;
 
@@ -11,21 +13,18 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false)
-            .Build();
+        var builder = Host.CreateApplicationBuilder(args);
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(connectionString)
-            .Options;
+        builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+        builder.Services.AddScoped<MovieService>();
 
-        await using var context = new AppDbContext(options);
+        var host = builder.Build();
 
-        var repository = new MovieRepository(context);
-        var service = new MovieService(repository);
+        using var scope = host.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<MovieService>();
 
         while (true)
         {
