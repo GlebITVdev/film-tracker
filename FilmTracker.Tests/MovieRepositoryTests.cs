@@ -2,25 +2,34 @@
 using FilmTracker.Core.Models;
 using FilmTracker.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Testcontainers.PostgreSql;
 
 namespace FilmTracker.Tests;
 
-public class MovieRepositoryTests
+public class MovieRepositoryTests : IClassFixture<DatabaseFixture>
 {
+    private readonly DatabaseFixture _fixture;
+
+    public MovieRepositoryTests(DatabaseFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     private AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql("Host=localhost;Port=5432;Database=filmtracker_test_db;Username=postgres;Password=postgres")
+            .UseNpgsql(_fixture.Container.GetConnectionString())
             .Options;
 
         var context = new AppDbContext(options);
     
-        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
-    
+        context.Movies.RemoveRange(context.Movies);
+        context.SaveChanges();
+
         return context;
     }
-    
+
     [Fact]
     public async Task AddAsync_ShouldAddMovie_WhenMovieIsValid()
     {
