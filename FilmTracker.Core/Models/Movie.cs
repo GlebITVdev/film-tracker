@@ -1,6 +1,6 @@
 namespace FilmTracker.Core.Models;
 
-public class Movie
+public record Movie
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
