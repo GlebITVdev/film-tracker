@@ -6,10 +6,10 @@ public record Movie
     public string Title { get; set; } = string.Empty;
     public MovieStatus Status { get; set; }
 
-    public Movie(string title, MovieStatus status)
+    public Movie(Guid id, string title, MovieStatus status)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         Title = title;
         Status = status;
-    }   
+    }
 }

@@ -2,36 +2,28 @@
 using FilmTracker.Core.Models;
 using FilmTracker.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using FilmTracker.Tests.Infrastructure;
 
 namespace FilmTracker.Tests;
 
-public class MovieRepositoryTests : IAsyncLifetime
+public class MovieRepositoryTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 {
-    private static readonly IConfiguration Configuration = new ConfigurationBuilder()
-        .SetBasePath(AppContext.BaseDirectory)
-        .AddJsonFile("appsettings.json", optional: false)
-        .Build();
+    private readonly DatabaseFixture _databaseFixture;
 
-    private AppDbContext CreateContext()
+    public MovieRepositoryTests(DatabaseFixture databaseFixture)
     {
-        var connectionString = Configuration.GetConnectionString("DefaultConnection");
-
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(connectionString)
-            .Options;
-
-        return new AppDbContext(options);
+        _databaseFixture = databaseFixture;
     }
 
-    private async Task SetupDatabaseAsync()
+    private AppDbContext CreateContext() => _databaseFixture.CreateContext();
+
+    private async Task ClearDatabaseAsync()
     {
         await using var context = CreateContext();
-        await context.Database.MigrateAsync();
         await context.Movies.ExecuteDeleteAsync();
     }
 
-    public async Task InitializeAsync() => await SetupDatabaseAsync();
+    public async Task InitializeAsync() => await ClearDatabaseAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
 
@@ -40,7 +32,9 @@ public class MovieRepositoryTests : IAsyncLifetime
     {
         await using var context = CreateContext();
         var repository = new MovieRepository(context);
-        var movie = new Movie("Inception", MovieStatus.ToWatch);
+
+        var movieId = Guid.NewGuid();
+        var movie = new Movie(movieId, "Inception", MovieStatus.ToWatch);
 
         await repository.AddAsync(movie);
 
@@ -57,20 +51,18 @@ public class MovieRepositoryTests : IAsyncLifetime
 
         var expected = new[]
         {
-            new Movie("Inception", MovieStatus.ToWatch),
-            new Movie("Interstellar", MovieStatus.ToWatch)
+            new Movie(Guid.NewGuid(), "Inception", MovieStatus.ToWatch),
+            new Movie(Guid.NewGuid(), "Interstellar", MovieStatus.ToWatch)
         };
 
         seedContext.Movies.AddRange(expected);
-        seedContext.Movies.Add(new Movie("The Dark Knight", MovieStatus.Watched));
+        seedContext.Movies.Add(new Movie(Guid.NewGuid(), "The Dark Knight", MovieStatus.Watched));
         await seedContext.SaveChangesAsync();
 
         var repository = new MovieRepository(context);
         var movies = await repository.GetByStatusAsync(MovieStatus.ToWatch);
 
-        Assert.Equal(
-            expected.OrderBy(movie => movie.Title),
-            movies.OrderBy(movie => movie.Title));
+        Assert.Equivalent(expected, movies);
     }
 
     [Fact]
@@ -81,20 +73,18 @@ public class MovieRepositoryTests : IAsyncLifetime
 
         var expected = new[]
         {
-            new Movie("Interstellar", MovieStatus.Watched),
-            new Movie("The Dark Knight", MovieStatus.Watched)
+            new Movie(Guid.NewGuid(), "Interstellar", MovieStatus.Watched),
+            new Movie(Guid.NewGuid(), "The Dark Knight", MovieStatus.Watched)
         };
 
-        seedContext.Movies.Add(new Movie("Inception", MovieStatus.ToWatch));
+        seedContext.Movies.Add(new Movie(Guid.NewGuid(), "Inception", MovieStatus.ToWatch));
         seedContext.Movies.AddRange(expected);
         await seedContext.SaveChangesAsync();
 
         var repository = new MovieRepository(context);
         var movies = await repository.GetByStatusAsync(MovieStatus.Watched);
 
-        Assert.Equal(
-            expected.OrderBy(movie => movie.Title),
-            movies.OrderBy(movie => movie.Title));
+        Assert.Equivalent(expected, movies);
     }
 
     [Fact]
@@ -105,8 +95,8 @@ public class MovieRepositoryTests : IAsyncLifetime
 
         var expected = new[]
         {
-            new Movie("Inception", MovieStatus.ToWatch),
-            new Movie("The Dark Knight", MovieStatus.Watched)
+            new Movie(Guid.NewGuid(), "Inception", MovieStatus.ToWatch),
+            new Movie(Guid.NewGuid(), "The Dark Knight", MovieStatus.Watched)
         };
 
         seedContext.Movies.AddRange(expected);
@@ -115,9 +105,7 @@ public class MovieRepositoryTests : IAsyncLifetime
         var repository = new MovieRepository(context);
         var movies = await repository.GetAllAsync();
 
-        Assert.Equal(
-            expected.OrderBy(movie => movie.Title),
-            movies.OrderBy(movie => movie.Title));
+        Assert.Equivalent(expected, movies);
     }
 
     [Fact]
@@ -135,7 +123,7 @@ public class MovieRepositoryTests : IAsyncLifetime
     {
         await using var context = CreateContext();
 
-        var movie = new Movie("Inception", MovieStatus.ToWatch);
+        var movie = new Movie(Guid.NewGuid(), "Inception", MovieStatus.ToWatch);
         await using var seedContext = CreateContext();
         seedContext.Movies.Add(movie);
         await seedContext.SaveChangesAsync();
@@ -161,7 +149,8 @@ public class MovieRepositoryTests : IAsyncLifetime
     {
         await using var context = CreateContext();
 
-        var movie = new Movie("Inception", MovieStatus.ToWatch);
+        var movieId = Guid.NewGuid();
+        var movie = new Movie(movieId, "Inception", MovieStatus.ToWatch);
         await using var seedContext = CreateContext();
         seedContext.Movies.Add(movie);
         await seedContext.SaveChangesAsync();
@@ -190,7 +179,9 @@ public class MovieRepositoryTests : IAsyncLifetime
     {
         await using var context = CreateContext();
         var repository = new MovieRepository(context);
-        var movie = new Movie("Inception", MovieStatus.ToWatch);
+
+        var movieId = Guid.NewGuid();
+        var movie = new Movie(movieId, "Inception", MovieStatus.ToWatch);
 
         var isUpdated = await repository.UpdateAsync(movie);
         Assert.False(isUpdated);
@@ -201,7 +192,8 @@ public class MovieRepositoryTests : IAsyncLifetime
     {
         await using var context = CreateContext();
 
-        var movie = new Movie("Inception", MovieStatus.ToWatch);
+        var movieId = Guid.NewGuid();
+        var movie = new Movie(movieId, "Inception", MovieStatus.ToWatch);
         await using var seedContext = CreateContext();
         seedContext.Movies.Add(movie);
         await seedContext.SaveChangesAsync();
