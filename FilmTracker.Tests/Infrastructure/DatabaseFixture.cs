@@ -22,5 +22,11 @@ public sealed class DatabaseFixture : IAsyncLifetime
         await context.Database.MigrateAsync();
     }
 
+    public async Task ClearDatabaseAsync()
+    {
+        await using var context = CreateContext();
+        await context.Movies.ExecuteDeleteAsync();
+    }
+
     public Task DisposeAsync() => Task.CompletedTask;
 }
