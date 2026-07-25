@@ -18,7 +18,7 @@ public class MovieService
             return false;
         }
 
-        var movie = new Movie(title.Trim(), status);
+        var movie = new Movie(Guid.NewGuid(),title.Trim(), status);
         await _repository.AddAsync(movie);
         return true;
     }
