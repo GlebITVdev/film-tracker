@@ -1,15 +1,8 @@
 namespace FilmTracker.Core.Models;
 
-public record Movie
+public record Movie(Guid Id, string Title, MovieStatus Status)
 {
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public MovieStatus Status { get; set; }
-
-    public Movie(Guid id, string title, MovieStatus status)
-    {
-        Id = id;
-        Title = title;
-        Status = status;
-    }
+    public Guid Id { get; set; } = Id;
+    public string Title { get; set; } = Title;
+    public MovieStatus Status { get; set; } = Status;
 }
